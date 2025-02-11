@@ -11,6 +11,9 @@ import (
 	"github.com/samber/lo"
 )
 
+// todo: これはmain側で持たせるべき
+var version string
+
 // Handlers is a struct that holds the handlers for the server
 type Handlers struct {
 	client port.Client
@@ -44,8 +47,7 @@ func (r *Handlers) Tags(c *gin.Context) {
 	c.JSON(http.StatusOK, api.ListResponse{Models: models})
 }
 
-func (r *Handlers) Version(c *gin.Context) {}
-
+// Chat sends a chat request to OpenAI
 func (r *Handlers) Chat(c *gin.Context) {
 	var req api.ChatRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -58,4 +60,9 @@ func (r *Handlers) Chat(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, res)
+}
+
+// Version returns the version of the server
+func (r *Handlers) Version(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"version": version})
 }
