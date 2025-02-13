@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 	"log"
-	"time"
 
+	"github.com/jonboulle/clockwork"
 	"github.com/ollama/ollama/api"
 	"github.com/openai/openai-go"
 	"github.com/samber/lo"
@@ -13,6 +13,7 @@ import (
 
 // Chat sends a chat request to OpenAI.
 func (c *OpenAIClient) Chat(ctx context.Context, req api.ChatRequest) (api.ChatResponse, error) {
+	clock := clockwork.FromContext(ctx)
 	tmp, err := c.client.Chat.Completions.New(ctx, toChatCompletionRequest(req))
 	if err != nil {
 		return api.ChatResponse{}, err
@@ -20,7 +21,7 @@ func (c *OpenAIClient) Chat(ctx context.Context, req api.ChatRequest) (api.ChatR
 	log.Println(tmp.Choices[0].Message.Content)
 	return api.ChatResponse{
 		Model:     req.Model,
-		CreatedAt: time.Now().UTC(),
+		CreatedAt: clock.Now().UTC(),
 		Message: api.Message{
 			Content: tmp.Choices[0].Message.Content,
 			Role:    string(openai.MessageRoleAssistant),
